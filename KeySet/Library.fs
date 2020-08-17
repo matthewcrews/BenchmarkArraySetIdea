@@ -78,25 +78,26 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
         KeySet(newValues.AsMemory(0, outIdx))
 
     static member intersect (a:KeySet<'a>) (b:KeySet<'a>) =
-        let (small, large) =
-            if a.Values.Length < b.Values.Length then
-                (a, b)
-            else
-                (b, a)
-        
-        let newValues = Array.zeroCreate(small.Values.Length)
+        let intersectAux (small:KeySet<'a>) (large:KeySet<'a>) =
 
-        let mutable smallIdx = 0
-        let mutable largeIdx = 0
-        let mutable outIdx = 0
+          let newValues = Array.zeroCreate(small.Values.Length)
 
-        while (smallIdx < small.Values.Length) do
-            largeIdx <- KeySet.findIndexOf largeIdx (small.Values.Span.[smallIdx]) large.Values
+          let mutable smallIdx = 0
+          let mutable largeIdx = 0
+          let mutable outIdx = 0
 
-            if small.Values.Span.[smallIdx] = large.Values.Span.[largeIdx] then
-                newValues.[outIdx] <- small.Values.Span.[smallIdx]
-                outIdx <- outIdx + 1
+          while (smallIdx < small.Values.Length) do
+              largeIdx <- KeySet.findIndexOf largeIdx (small.Values.Span.[smallIdx]) large.Values
 
-            smallIdx <- smallIdx + 1
+              if small.Values.Span.[smallIdx] = large.Values.Span.[largeIdx] then
+                  newValues.[outIdx] <- small.Values.Span.[smallIdx]
+                  outIdx <- outIdx + 1
 
-        KeySet(newValues.AsMemory().Slice(0, outIdx))
+              smallIdx <- smallIdx + 1
+
+          KeySet(newValues.AsMemory().Slice(0, outIdx))
+
+        if a.Values.Length < b.Values.Length then
+          intersectAux a b
+        else
+          intersectAux b a

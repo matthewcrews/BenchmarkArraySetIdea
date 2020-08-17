@@ -20,29 +20,29 @@ let rng = System.Random(123)
 //    |> Array.map KeySet
 
 
+let numberOfSets = 1_000
+let populationSize = 1_000
+let setSize = 10
+
 module Set =
 
-    let genData numberOfSets populationSize setSize =
+    let data =
         let rng = System.Random(123)
         [|for _ in 0..numberOfSets-1 do
             [|for _ in 1..setSize -> rng.Next(0, populationSize)|]
             |> Set.ofArray
         |]
 
-    let unionTest numberOfSets populationSize setSize =
-
-        let data = genData numberOfSets populationSize setSize
-
+    let unionTest () =
+        let rng = System.Random(123)
         let mutable result = Set.empty
         for _ in 1..10_000 do
             result <- data.[rng.Next(0, numberOfSets)] + data.[rng.Next(0, numberOfSets)]
 
         result.Count
 
-    let intersectTest numberOfSets populationSize setSize =
-        
-        let data = genData numberOfSets populationSize setSize
-        
+    let intersectTest () =
+        let rng = System.Random(123)
         let mutable result = Set.empty
         for _ in 1..10_000 do
             result <- Set.intersect data.[rng.Next(0, numberOfSets)] data.[rng.Next(0, numberOfSets)]
@@ -51,14 +51,13 @@ module Set =
 
 module KeySet =
 
-    let genData numberOfSets populationSize setSize =
-        Set.genData numberOfSets populationSize setSize
+    let data =
+        Set.data
         |> Array.map KeySet
         
 
-    let unionTest numberOfSets populationSize setSize =
-        
-        let data = genData numberOfSets populationSize setSize
+    let unionTest () =
+        let rng = System.Random(123)
         let mutable result = KeySet (Set.empty)
 
         for _ in 1..10_000 do
@@ -66,9 +65,8 @@ module KeySet =
 
         result.Values.Length
 
-    let intersectTest numberOfSets populationSize setSize =
-        
-        let data = genData numberOfSets populationSize setSize
+    let intersectTest () =
+        let rng = System.Random(123)
         let mutable result = KeySet (Set.empty)
 
         for _ in 1..10_000 do
