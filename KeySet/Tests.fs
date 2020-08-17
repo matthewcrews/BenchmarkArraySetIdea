@@ -20,10 +20,10 @@ let rng = System.Random(123)
 //    |> Array.map KeySet
 
 
-let numberOfSets = 1_000
+let numberOfSets = 100_000
 let populationSize = 100
 let setSize = 30
-let numberIterations = 50_000
+let numberIterations = numberOfSets
 
 module Set =
 
@@ -35,19 +35,18 @@ module Set =
         |]
 
     let unionTest () =
-        let rng = System.Random(123)
         let mutable result = Set.empty
-        for _ in 1..numberIterations do
-            result <- data.[rng.Next(0, numberOfSets)] + data.[rng.Next(0, numberOfSets)]
+
+        for i in 0..numberIterations-1 do
+            result <- data.[i] + data.[i]
 
         result.Count
 
     let intersectTest () =
-        let rng = System.Random(123)
         let mutable result = Set.empty
 
-        for _ in 1..numberIterations do
-            result <- Set.intersect data.[rng.Next(0, numberOfSets)] data.[rng.Next(0, numberOfSets)]
+        for i in 0..numberIterations-1 do
+            result <- Set.intersect data.[i] data.[i]
 
         result.Count
 
@@ -59,19 +58,17 @@ module KeySet =
         
 
     let unionTest () =
-        let rng = System.Random(123)
         let mutable result = KeySet (Set.empty)
 
-        for _ in 1..numberIterations do
-            result <- data.[rng.Next(0, numberOfSets)] + data.[rng.Next(0, numberOfSets)]
+        for i in 0..numberIterations-1 do
+            result <- data.[i] + data.[i]
 
         result.Values.Length
 
     let intersectTest () =
-        let rng = System.Random(123)
         let mutable result = KeySet (Set.empty)
 
-        for _ in 1..numberIterations do
-            result <- KeySet.intersect data.[rng.Next(0, numberOfSets)] data.[rng.Next(0, numberOfSets)]
+        for i in 0..numberIterations-1 do
+            result <- KeySet.intersect data.[i] data.[i]
 
         result.Values.Length

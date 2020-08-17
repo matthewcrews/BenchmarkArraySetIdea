@@ -1,9 +1,6 @@
-﻿using System;
-
+﻿
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using KeySet;
-using Microsoft.FSharp.Collections;
 
 namespace BenchmarkArraySetIdea
 {
@@ -37,17 +34,17 @@ namespace BenchmarkArraySetIdea
         //    return KeySet.Tests.KeySet.genData(1000, PopulationSize, NumberOfValues);
         //}
         // Union
-        //[Benchmark]
-        //public int SetUnion()
-        //{
-        //    return KeySet.Tests.Set.unionTest();
-        //}
+        [Benchmark]
+        public int SetUnion()
+        {
+            return KeySet.Tests.Set.unionTest();
+        }
 
-        //[Benchmark]
-        //public int KeySetUnion()
-        //{
-        //    return KeySet.Tests.KeySet.unionTest();
-        //}
+        [Benchmark]
+        public int KeySetUnion()
+        {
+            return KeySet.Tests.KeySet.unionTest();
+        }
 
         // Intersect
         [Benchmark]
