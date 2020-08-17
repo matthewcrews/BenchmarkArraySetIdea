@@ -83,13 +83,13 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
           let newValues = Array.zeroCreate(small.Values.Length)
 
           let mutable smallIdx = 0
-          let mutable largeIdx = 0
+          let mutable largeLowerIdx = 0
           let mutable outIdx = 0
 
           while (smallIdx < small.Values.Length) do
-              largeIdx <- KeySet.findIndexOf largeIdx (small.Values.Span.[smallIdx]) large.Values
+              largeLowerIdx <- KeySet.findIndexOf largeLowerIdx (small.Values.Span.[smallIdx]) large.Values
 
-              if small.Values.Span.[smallIdx] = large.Values.Span.[largeIdx] then
+              if small.Values.Span.[smallIdx] = large.Values.Span.[largeLowerIdx] then
                   newValues.[outIdx] <- small.Values.Span.[smallIdx]
                   outIdx <- outIdx + 1
 
