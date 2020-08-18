@@ -5,7 +5,6 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkArraySetIdea
 {
-    [EtwProfiler]
     [MemoryDiagnoser]
     public class Program
     {

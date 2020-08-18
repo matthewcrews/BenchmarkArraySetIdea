@@ -49,7 +49,6 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
         let mutable outIdx = 0
 
         while (aIdx < a.Values.Length && bIdx < b.Values.Length) do
-
             
             if a.Values.Span.[aIdx] < b.Values.Span.[bIdx] then
                 newValues.[outIdx] <- a.Values.Span.[aIdx]
@@ -78,7 +77,7 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
         KeySet(newValues.AsMemory(0, outIdx))
 
     static member intersect (a:KeySet<'a>) (b:KeySet<'a>) =
-        let intersectAux (small:KeySet<'a>) (large:KeySet<'a>) =
+        let intersectAux comparer (small:KeySet<'a>) (large:KeySet<'a>) =
 
           let newValues = Array.zeroCreate(small.Values.Length)
 
@@ -98,6 +97,6 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
           KeySet(newValues.AsMemory().Slice(0, outIdx))
 
         if a.Values.Length < b.Values.Length then
-          intersectAux a b
+          intersectAux  a b
         else
           intersectAux b a
