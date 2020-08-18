@@ -1,29 +1,30 @@
 ﻿namespace KeySet
 
 open System
+open System.Collections.Generic
 
-type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
-
+type KeySet<[<EqualityConditionalOn>]'a when 'a : comparison>(comparer:IComparer<'a>, values:Memory<'a>) =
+    member this.Comparer = comparer
     member this.Values = values
 
     new(values:Set<'a>) =
+        let comparer = LanguagePrimitives.FastGenericComparer<'a>
         let v = Set.toArray values
-        KeySet(v.AsMemory())
+        KeySet(comparer, v.AsMemory<'a>())
 
-    static member findIndexOf startingLowerBound x (values:Memory<'a>) =
+    static member inline findIndexOf (comparer:IComparer<'a>) startingLowerBound x (values:Memory<'a>) =
         let mutable lowerBound = startingLowerBound
         let mutable upperBound = values.Length - 1
         let mutable idx = (lowerBound + upperBound) / 2
 
         while lowerBound <= upperBound do
-            if values.Span.[idx] <= x then
+            let x = comparer.Compare(values.Span.[idx], x)
+            if x <= 0 then
                 lowerBound <- idx + 1
                 idx <- (lowerBound + upperBound) / 2
-            elif values.Span.[idx] > x then
+            else
                 upperBound <- idx - 1
                 idx <- (lowerBound + upperBound) / 2
-            else
-                ()
 
         idx
 
@@ -37,9 +38,9 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
             else
                 KeySet(Set.empty)
         else
-            let idx = KeySet.findIndexOf 0 x this.Values
+            let idx = KeySet.findIndexOf this.Comparer 0 x values
 
-            KeySet (this.Values.Slice(idx + 1))
+            KeySet (comparer, values.Slice(idx + 1))
 
     static member inline (+) (a:KeySet<'a>, b:KeySet<'a>) =
         let newValues = Array.zeroCreate(a.Values.Length + b.Values.Length)
@@ -74,9 +75,9 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
             bIdx <- bIdx + 1
             outIdx <- outIdx + 1
 
-        KeySet(newValues.AsMemory(0, outIdx))
+        KeySet(a.Comparer, newValues.AsMemory(0, outIdx))
 
-    static member intersect (a:KeySet<'a>) (b:KeySet<'a>) =
+    static member inline intersect (a:KeySet<'a>) (b:KeySet<'a>) =
         let intersectAux (small:KeySet<'a>) (large:KeySet<'a>) =
 
           let newValues = Array.zeroCreate(small.Values.Length)
@@ -86,15 +87,16 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
           let mutable outIdx = 0
 
           while (smallIdx < small.Values.Length) do
-              largeLowerIdx <- KeySet.findIndexOf largeLowerIdx (small.Values.Span.[smallIdx]) large.Values
+              largeLowerIdx <- KeySet.findIndexOf a.Comparer largeLowerIdx (small.Values.Span.[smallIdx]) large.Values
 
-              if small.Values.Span.[smallIdx] = large.Values.Span.[largeLowerIdx] then
+              let x = a.Comparer.Compare(small.Values.Span.[smallIdx], large.Values.Span.[largeLowerIdx])
+              if x = 0 then
                   newValues.[outIdx] <- small.Values.Span.[smallIdx]
                   outIdx <- outIdx + 1
 
               smallIdx <- smallIdx + 1
 
-          KeySet(newValues.AsMemory().Slice(0, outIdx))
+          KeySet(a.Comparer, newValues.AsMemory().Slice(0, outIdx))
 
         if a.Values.Length < b.Values.Length then
           intersectAux  a b
