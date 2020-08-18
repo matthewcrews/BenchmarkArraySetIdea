@@ -77,7 +77,7 @@ type KeySet<'a when 'a : comparison>(values:Memory<'a>) =
         KeySet(newValues.AsMemory(0, outIdx))
 
     static member intersect (a:KeySet<'a>) (b:KeySet<'a>) =
-        let intersectAux comparer (small:KeySet<'a>) (large:KeySet<'a>) =
+        let intersectAux (small:KeySet<'a>) (large:KeySet<'a>) =
 
           let newValues = Array.zeroCreate(small.Values.Length)
 
